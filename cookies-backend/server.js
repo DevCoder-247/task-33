@@ -21,7 +21,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/set-cookie', (req, res) => {
-    res.cookie('user', 'Abhay Chikte', {httpOnly: true});
+    res.cookie('user', 'Abhay Chikte', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    });
     res.status(200).send('Cookie has been set');
 });
 
@@ -39,40 +43,52 @@ app.get('/get-cookie', (req, res) => {
     }
 });
 
+// app.get('/status/:code', (req, res) => {
+//     const { code } = req.params;
+//     const status = parseInt(code, 10);
+//     let message = 'Okay';
+
+//     switch(status) {
+//         case 200:
+//             message = 'Success';
+//             break;
+//         case 201:
+//             message = 'Created';
+//             break;
+//         case 303:
+//             message = 'See other';
+//             break;
+//         case 206:
+//             message = 'partial content';
+//             break;
+//         case 301:
+//             message = 'moved recently';
+//             break;
+//         case 302:
+//             message = 'Found';
+//             break;
+//         default:
+//             return res.status(400).json({
+//                 message: 'Unsupported status code'
+//             })
+//     }
+
+//     res.status(status).json({
+//         message: message
+//     });
+// });
+
 app.get('/status/:code', (req, res) => {
-    const { code } = req.params;
-    const status = parseInt(code, 10);
-    let message = 'Okay';
+  const status = parseInt(req.params.code, 10);
+  if (isNaN(status) || status < 100 || status > 599) {
+    return res.status(400).json({ message: 'Invalid status code' });
+  }
 
-    switch(status) {
-        case 200:
-            message = 'Success';
-            break;
-        case 201:
-            message = 'Created';
-            break;
-        case 400:
-            message = 'Bad Request';
-            break;
-        case 401:
-            message = 'Unauthorized';
-            break;
-        case 404:
-            message = 'Not Found';
-            break;
-        case 500:
-            message = 'Internal Server Error';
-            break;
-        default:
-            return res.status(400).json({
-                message: 'Unsupported status code'
-            })
-    }
-
-    res.status(status).json({
-        message: message
-    });
+  res.status(status).json({
+    message: `Response with status ${status}`
+  });
 });
+
 
 app.listen(port, ()=> {
     console.log(`Server is running on http://localhost:${port}`);

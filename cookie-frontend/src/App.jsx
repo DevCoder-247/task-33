@@ -3,7 +3,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-const API = import.meta.env.VITE_API_URL;
+const API = 'https://task-33-ef02.onrender.com';
 
 function App() {
   const [response, setResponse] = useState('');
@@ -81,7 +81,7 @@ function App() {
 
       <h3 style={{ marginTop: '2rem' }}>Status Tests</h3>
       <div>
-        {[200, 201, 400, 404, 500].map(code => (
+        {[200, 201, 303, 206, 301, 302].map(code => (
           <button
             key={code}
             onClick={() => testStatus(code)}
