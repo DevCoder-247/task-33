@@ -3,7 +3,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-const API = 'http://localhost:3000';
+const API = import.meta.env.VITE_API_URL;
 
 function App() {
   const [response, setResponse] = useState('');
