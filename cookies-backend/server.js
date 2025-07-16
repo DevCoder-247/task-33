@@ -8,7 +8,7 @@ const port = 3000 || process.env.PORT;
 
 //middleware setup
 app.use(cors({
-    origin: 'http://localhost:5173', // Frontend URL
+    origin: ['http://localhost:5173','https://task-33-lake.vercel.app'], // Frontend URL
     credentials: true // allows cookies to be sent with requests
 }));
 app.use(bodyParser.json());
