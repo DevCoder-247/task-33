@@ -3,7 +3,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-const API = 'https://task-33-ef02.onrender.com';
+const API = import.meta.env.VITE_API_URL
 
 function App() {
   const [response, setResponse] = useState('');
