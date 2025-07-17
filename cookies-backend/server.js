@@ -1,37 +1,40 @@
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const app  =  express();
-const port =  process.env.PORT;
+const app = express();
+const port = process.env.PORT || 3000;
 
-//middleware setup
+// Middleware setup
 app.use(cors({
-    origin: ['http://localhost:5173','https://task-33-70kkezzpn-abhays-projects-596787af.vercel.app'], // Frontend URL
-    credentials: true // allows cookies to be sent with requests
+    origin: process.env.FRONTEND_URLS?.split(',') || [
+      'http://localhost:5173',
+      'https://task-33-70kkezzpn-abhays-projects-596787af.vercel.app'
+    ],
+    credentials: true
 }));
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 
-//Routes
+// Routes
 app.get('/', (req, res) => {
     res.send('Welcome to the server');
-
 });
 
 app.get('/set-cookie', (req, res) => {
     res.cookie('user', 'Abhay Chikte', {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none'
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
-    res.status(200).send('Cookie has been set');
+    res.status(200).json({ message: 'Cookie has been set' });
 });
 
 app.get('/get-cookie', (req, res) => {
-    const cookie = req.cookies.user || 'No cookie found';
-    if(cookie) {
+    const cookie = req.cookies.user;
+    if (cookie) {
         res.status(200).json({
             user: cookie,
             message: 'Cookie retrieved successfully'
@@ -43,53 +46,28 @@ app.get('/get-cookie', (req, res) => {
     }
 });
 
-// app.get('/status/:code', (req, res) => {
-//     const { code } = req.params;
-//     const status = parseInt(code, 10);
-//     let message = 'Okay';
-
-//     switch(status) {
-//         case 200:
-//             message = 'Success';
-//             break;
-//         case 201:
-//             message = 'Created';
-//             break;
-//         case 303:
-//             message = 'See other';
-//             break;
-//         case 206:
-//             message = 'partial content';
-//             break;
-//         case 301:
-//             message = 'moved recently';
-//             break;
-//         case 302:
-//             message = 'Found';
-//             break;
-//         default:
-//             return res.status(400).json({
-//                 message: 'Unsupported status code'
-//             })
-//     }
-
-//     res.status(status).json({
-//         message: message
-//     });
-// });
-
 app.get('/status/:code', (req, res) => {
-  const status = parseInt(req.params.code, 10);
-  if (isNaN(status) || status < 100 || status > 599) {
-    return res.status(400).json({ message: 'Invalid status code' });
-  }
+    const status = parseInt(req.params.code, 10);
+    const statusMessages = {
+        200: 'OK - Successful request',
+        201: 'Created - Resource created successfully',
+        400: 'Bad Request - Invalid input',
+        404: 'Not Found - Resource not found',
+        500: 'Internal Server Error'
+    };
 
-  res.status(status).json({
-    message: `Response with status ${status}`
-  });
+    if (!statusMessages[status]) {
+        return res.status(400).json({
+            message: 'Unsupported status code'
+        });
+    }
+
+    res.status(status).json({
+        message: statusMessages[status],
+        statusCode: status
+    });
 });
 
-
-app.listen(port, ()=> {
+app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
