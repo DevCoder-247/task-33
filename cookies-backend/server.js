@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 app.use(cors({
     origin: process.env.FRONTEND_URLS?.split(',') || [
       'http://localhost:5173',
-      'https://task-33-70kkezzpn-abhays-projects-596787af.vercel.app'
+      'https://task-33-lake.vercel.app'
     ],
     credentials: true
 }));
